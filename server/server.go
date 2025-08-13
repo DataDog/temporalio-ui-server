@@ -34,7 +34,6 @@ import (
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
-	"github.com/temporalio/ui-server/v2/server/cors"
 	"github.com/temporalio/ui-server/v2/server/csrf"
 	"github.com/temporalio/ui-server/v2/server/headers"
 	"github.com/temporalio/ui-server/v2/server/route"
@@ -85,14 +84,14 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	}
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
-	e.Use(cors.CORSMiddleware(cors.CORSConfig{
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: cfg.CORS.AllowOrigins,
 		AllowHeaders: []string{
 			echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,
 			echo.HeaderXCSRFToken, echo.HeaderAuthorization, auth.AuthorizationExtrasHeader,
 			"Caller-Type",
 		},
 		AllowCredentials: true,
-		ConfigProvider:   cfgProvider,
 	}))
 	e.Use(middleware.Secure())
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
@@ -128,7 +127,6 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 			}
 		}
 		route.SetUIRoutes(e, cfg.PublicPath, assets)
-		route.SetRenderRoute(e, cfg.PublicPath)
 	}
 
 	s := &Server{

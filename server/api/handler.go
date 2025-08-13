@@ -45,16 +45,20 @@ import (
 )
 
 type Auth struct {
-	Enabled bool
-	Options []string
+	Enabled          bool
+	Flow             string
+	ProviderURL      string
+	IssuerURL        string
+	AuthorizationURL string
+	ClientID         string
+	Scopes           []string
+	Options          []string
 }
 
 type CodecResponse struct {
-	Endpoint            string
-	PassAccessToken     bool
-	IncludeCredentials  bool
-	DefaultErrorMessage string
-	DefaultErrorLink    string
+	Endpoint           string
+	PassAccessToken    bool
+	IncludeCredentials bool
 }
 
 type SettingsResponse struct {
@@ -70,13 +74,11 @@ type SettingsResponse struct {
 	WorkflowTerminateDisabled     bool
 	WorkflowCancelDisabled        bool
 	WorkflowSignalDisabled        bool
-	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
 	HideWorkflowQueryErrors       bool
 	RefreshWorkflowCountsDisabled bool
-	ActivityCommandsDisabled      bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
@@ -119,17 +121,24 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 		}
 
 		var options []string
+		var authProviderCfg config.AuthProvider
 		if len(cfg.Auth.Providers) != 0 {
-			authProviderCfg := cfg.Auth.Providers[0].Options
-			for k := range authProviderCfg {
+			authProviderCfg = cfg.Auth.Providers[0]
+			for k := range authProviderCfg.Options {
 				options = append(options, k)
 			}
 		}
 
 		settings := &SettingsResponse{
 			Auth: &Auth{
-				Enabled: cfg.Auth.Enabled,
-				Options: options,
+				Enabled:          cfg.Auth.Enabled,
+				Flow:             authProviderCfg.Flow,
+				ProviderURL:      authProviderCfg.ProviderURL,
+				IssuerURL:        authProviderCfg.IssuerURL,
+				AuthorizationURL: authProviderCfg.AuthorizationURL,
+				ClientID:         authProviderCfg.ClientID,
+				Scopes:           authProviderCfg.Scopes,
+				Options:          options,
 			},
 			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,
@@ -137,24 +146,20 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			FeedbackURL:                 cfg.FeedbackURL,
 			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Codec: &CodecResponse{
-				Endpoint:            cfg.Codec.Endpoint,
-				PassAccessToken:     cfg.Codec.PassAccessToken,
-				IncludeCredentials:  cfg.Codec.IncludeCredentials,
-				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
-				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
+				Endpoint:           cfg.Codec.Endpoint,
+				PassAccessToken:    cfg.Codec.PassAccessToken,
+				IncludeCredentials: cfg.Codec.IncludeCredentials,
 			},
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
 			WorkflowTerminateDisabled:     cfg.WorkflowTerminateDisabled,
 			WorkflowCancelDisabled:        cfg.WorkflowCancelDisabled,
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
-			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
-			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
 		}
 
 		return c.JSON(http.StatusOK, settings)
@@ -220,7 +225,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 
 func withMarshaler() runtime.ServeMuxOption {
 	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
-		contentType: "application/json",
+		contentType: runtime.MIMEWildcard,
 		mOpts: temporalproto.CustomJSONMarshalOptions{
 			Indent: "  ",
 		},

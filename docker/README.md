@@ -15,6 +15,7 @@ docker run \
     -e TEMPORAL_ADDRESS=127.0.0.1:7233 \
     -e TEMPORAL_UI_PORT=8080 \
     -e TEMPORAL_AUTH_ENABLED=true \
+    -e TEMPORAL_AUTH_FLOW_TYPE=authorization-code \
     -e TEMPORAL_AUTH_PROVIDER_URL=https://accounts.google.com \
     -e TEMPORAL_AUTH_CLIENT_ID=xxxxx-xxxx.apps.googleusercontent.com \
     -e TEMPORAL_AUTH_CLIENT_SECRET=xxxxxxxxxxxxxxx \
@@ -28,15 +29,7 @@ docker run \
     temporalio/ui:latest
 ```
 
-For all env options see [Config template file](./config/docker.yaml) or [Configuration Docs](https://docs.temporal.io/references/web-ui-configuration)
-
-## Config template
-
-The config file can use templating which uses [go's text templating](https://pkg.go.dev/text/template) and [Sprig's helpers](https://masterminds.github.io/sprig/).
-
-To enable templating you can add a commented "# enable-template" line at the top of the file.
-
-Note: Previously our docker images supported Dockerize for templating. This is now deprecated, and will be removed soon. If you have an existing custom config templating using dockerize, it will need to be adjusted to use Sprig's helpers. A good example of this is the `default` helper which uses a different argument ordering to dockerize.
+For all env options see [Config template file](./config-template.yaml) or [Configuration Docs](https://docs.temporal.io/references/web-ui-configuration)
 
 ## Serve UI under a sub-path
 
