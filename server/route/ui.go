@@ -24,20 +24,12 @@ package route
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"log"
 	"net/http"
-	"path"
 	"regexp"
 	"strings"
-
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
 
 	"github.com/labstack/echo/v4"
 )
