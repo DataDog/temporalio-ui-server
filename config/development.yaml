@@ -12,7 +12,7 @@ defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
 notifyOnNewVersion: true
-disableWriteActions: false
+disableWriteActions: true
 workflowTerminateDisabled: false
 workflowCancelDisabled: false
 workflowSignalDisabled: false
