@@ -13,7 +13,7 @@ feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}
 notifyOnNewVersion: {{ env "TEMPORAL_NOTIFY_ON_NEW_VERSION" | default "true" }}
 refreshInterval: {{ env "TEMPORAL_CONFIG_REFRESH_INTERVAL" | default "0s" }}
 showTemporalSystemNamespace: {{ env "TEMPORAL_SHOW_TEMPORAL_SYSTEM_NAMESPACE" | default "false" }}
-disableWriteActions: {{ env "TEMPORAL_DISABLE_WRITE_ACTIONS" | default "false" }}
+disableWriteActions: {{ env "TEMPORAL_DISABLE_WRITE_ACTIONS" | default "true" }}
 workflowTerminateDisabled: {{ env "TEMPORAL_WORKFLOW_TERMINATE_DISABLED" | default "false" }}
 workflowCancelDisabled: {{ env "TEMPORAL_WORKFLOW_CANCEL_DISABLED" | default "false" }}
 workflowSignalDisabled: {{ env "TEMPORAL_WORKFLOW_SIGNAL_DISABLED" | default "false" }}
