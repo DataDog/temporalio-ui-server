@@ -2,6 +2,8 @@ module github.com/temporalio/ui-server/v2
 
 go 1.23.0
 
+toolchain go1.26.2
+
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/coreos/go-oidc/v3 v3.11.0
