@@ -12,7 +12,7 @@ defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
 notifyOnNewVersion: true
-disableWriteActions: true
+disableWriteActions: false
 workflowTerminateDisabled: false
 workflowCancelDisabled: false
 workflowSignalDisabled: false
@@ -31,7 +31,7 @@ auth:
       flow: implicit
       # TODO: support optional issuer validation
       authorizationUrl: https://vault.us1.ddbuild.io/v1/auth/oidc-provider/authorization
-      clientId: atlas
+      clientId: atlas-staging
       scopes:
         - openid
         - profile

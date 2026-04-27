@@ -101,9 +101,9 @@ type (
 	}
 
 	AuthProvider struct {
-		// Label - optional label for the provider
+		// Optional. Label for the provider.
 		Label string `yaml:"label"`
-		// Type of the auth provider. Only OIDC is supported today
+		// Type of the auth provider. Only OIDC is supported today.
 		Type string `yaml:"type"`
 		// OIDC login flow type. The "authorization-code" and "implicit" flows are supported.
 		Flow string `yaml:"flow"`
