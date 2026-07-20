@@ -88,32 +88,43 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	providerCfg := serverCfg.Auth.Providers[0] // only single provider is currently supported
 
-	if len(providerCfg.IssuerUrl) > 0 {
-		ctx = oidc.InsecureIssuerURLContext(ctx, providerCfg.IssuerUrl)
-	}
-	provider, err := oidc.NewProvider(ctx, providerCfg.ProviderURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	oidcConfig := &oidc.Config{ClientID: providerCfg.ClientID}
-	verifier := provider.Verifier(oidcConfig)
-	auth.SetVerifier(verifier)
-
-	oauthCfg := oauth2.Config{
-		ClientID:     providerCfg.ClientID,
-		ClientSecret: providerCfg.ClientSecret,
-		Endpoint:     provider.Endpoint(),
-		RedirectURL:  providerCfg.CallbackURL,
-		Scopes:       providerCfg.Scopes,
-	}
-
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
-	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/logout", logout())
+	switch providerCfg.Flow {
+	case "authorization-code":
+		if len(providerCfg.IssuerURL) > 0 {
+			ctx = oidc.InsecureIssuerURLContext(ctx, providerCfg.IssuerURL)
+		}
+
+		if len(providerCfg.AuthorizationURL) > 0 {
+			log.Fatal(`authorization url should not be set for auth code flow`)
+		}
+
+		provider, err := oidc.NewProvider(ctx, providerCfg.ProviderURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		oidcConfig := &oidc.Config{ClientID: providerCfg.ClientID}
+		verifier := provider.Verifier(oidcConfig)
+		auth.SetVerifier(verifier)
+
+		oauthCfg := oauth2.Config{
+			ClientID:     providerCfg.ClientID,
+			ClientSecret: providerCfg.ClientSecret,
+			Endpoint:     provider.Endpoint(),
+			RedirectURL:  providerCfg.CallbackURL,
+			Scopes:       providerCfg.Scopes,
+		}
+
+		api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
+		api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
+		api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
+		api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
+		api.GET("/logout", logout())
+	case "implicit":
+		// The implicit flow is principally designed for single-page applications.
+		// Fully delegated to the client.
+	}
 }
 
 func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
