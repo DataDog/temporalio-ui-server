@@ -1,0 +1,1 @@
+import{Q as n,R as o}from"./DAIHaMdg.js";const e="core-context",c=t=>{n(e,t)};function r(){return o(e)}function s(t){return t?`${t} - webui`:"webui"}function u(){const t=r().getUserIdentifier();return s(t)}export{u as g,c as s};

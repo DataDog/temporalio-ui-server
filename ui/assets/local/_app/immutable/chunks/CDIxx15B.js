@@ -1,0 +1,1 @@
+import{B as o,C as v,A as y,E as l,D as T,G as f,I as p,J as A,K as i,H as m,L as E}from"./DAIHaMdg.js";function g(d,_,e){var s;o&&(s=E,v());var r=new A(d);y(()=>{var a=_()??null;if(o){var h=T(s),c=h===m,u=a!==null;if(c!==u){var t=f();p(t),r.anchor=t,i(!1),r.ensure(a,a&&(n=>e(n,a))),i(!0);return}}r.ensure(a,a&&(n=>e(n,a)))},l)}export{g as c};

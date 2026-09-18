@@ -1,0 +1,1 @@
+import{av as t,A as c,B as i,C as y,J as f}from"./DAIHaMdg.js";const l=Symbol("NaN");function h(e,r,n){i&&y();var s=new f(e),o=!t();c(()=>{var a=r();a!==a&&(a=l),o&&a!==null&&typeof a=="object"&&(a={}),s.ensure(a,n)})}export{h as k};
